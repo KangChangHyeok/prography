@@ -9,63 +9,65 @@ import UIKit
 
 final class HomeViewController: UIViewController {
     
-    private var bannerCollectionView = UICollectionView(frame: .zero, collectionViewLayout: bannerCollectionViewLayout()).configure {
-        <#code#>
+    private lazy var bannerCollectionView = UICollectionView(
+        frame: .zero,
+        collectionViewLayout: bannerCollectionViewLayout()
+    ).configure {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.showsHorizontalScrollIndicator = false
+        $0.backgroundColor = .white
     }
+    
+    private var bannerDataSource: UICollectionViewDiffableDataSource<Int, Int>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        configureLayout()
+        configureDataSource()
+        
+        var snapShot = NSDiffableDataSourceSnapshot<Int, Int>()
+        snapShot.appendSections([0])
+        snapShot.appendItems(Array(0..<5))
+        bannerDataSource.apply(snapShot, animatingDifferences: false)
     }
-
-//    func nowPlayingMovies() {
-//        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing")!
-//        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
-//        let queryItems: [URLQueryItem] = [
-//          URLQueryItem(name: "language", value: "ko-KR"),
-//          URLQueryItem(name: "page", value: "1"),
-//        ]
-//        components.queryItems = components.queryItems.map { $0 + queryItems } ?? queryItems
-//
-//        var request = URLRequest(url: components.url!)
-//        request.httpMethod = "GET"
-//        request.timeoutInterval = 10
-//        request.allHTTPHeaderFields = [
-//          "accept": "application/json",
-//          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YmZiZjIwYzI2MmE4NDdhYTRlNzNhNTUxM2JkOThhNSIsIm5iZiI6MTczOTc1NDAwNy40NDk5OTk4LCJzdWIiOiI2N2IyOGExN2U1ZTFhN2VkN2NlMGYxMjkiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.cm8VPvvj7LVb3Oby8L09E9pBsBQme8jR9LoHPPo-o3Y"
-//        ]
-//
-//        Task {
-//            let (data, _) = try await URLSession.shared.data(for: request)
-//            print(String(decoding: data, as: UTF8.self))
-//        }
-//    }
 }
 
 private extension HomeViewController {
+    
+    func configureLayout() {
+        view.addSubview(bannerCollectionView)
+        let bannerCollectionViewLayoutConstraints: [NSLayoutConstraint] = [
+            bannerCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            bannerCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bannerCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bannerCollectionView.heightAnchor.constraint(equalToConstant: 221)
+        ]
+        NSLayoutConstraint.activate(bannerCollectionViewLayoutConstraints)
+    }
 
     func bannerCollectionViewLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(316), heightDimension: .absolute(205))
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-        group.interItemSpacing = .fixed(8)
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
-        
+        section.orthogonalScrollingBehavior = .continuous
+        section.contentInsets = .init(top: 8, leading: 16, bottom: 8, trailing: 16)
+        section.interGroupSpacing = 8
         let layout = UICollectionViewCompositionalLayout(section: section)
         return layout
     }
     
-    func setDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<CommentCVCell, Comments.Comment.ID> { [weak self] cell, _, commentID in
-            guard let comment = self?.viewModel.state.comments?[commentID] else { return }
-            cell.bind(comment: comment, viewModel: self?.viewModel)
+    func configureDataSource() {
+        let cellRegistration = UICollectionView.CellRegistration<BannerCell, Int> { cell, _, commentID in
+            cell.bind(title: "Title", description: "Description")
         }
         
-        dataSource = UICollectionViewDiffableDataSource<Section, Comments.Comment.ID>(collectionView: commentCollectionView) { collectionView, indexPath, magazine in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: magazine)
+        bannerDataSource = UICollectionViewDiffableDataSource<Int, Int>(collectionView: bannerCollectionView) { collectionView, indexPath, item in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
     }
 }
