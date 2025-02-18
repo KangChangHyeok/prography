@@ -14,6 +14,7 @@ final class BannerCell: UICollectionViewCell {
         $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 26
         $0.backgroundColor = .black
+        
     }
     
     private var titleLabel = UILabel().configure {

@@ -23,7 +23,7 @@ final class MainTabBarController: UITabBarController {
             selectedImageName: "RedStar"
         )
         self.tabBar.unselectedItemTintColor = .black
-        self.tabBar.tintColor = .init(hex: "D81D45")
+        self.tabBar.tintColor = .main
         self.tabBar.backgroundColor = .init(hex: "f2f2f7")
         viewControllers = [HomeNavController, MyNavController]
     }
