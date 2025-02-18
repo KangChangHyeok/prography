@@ -22,10 +22,21 @@ final class MainTabBarController: UITabBarController {
             imageName: "Star",
             selectedImageName: "RedStar"
         )
-        self.tabBar.unselectedItemTintColor = .black
-        self.tabBar.tintColor = .main
-        self.tabBar.backgroundColor = .init(hex: "f2f2f7")
         viewControllers = [HomeNavController, MyNavController]
+        
+        let tabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.backgroundColor = .init(hex: "f2f2f7")
+        
+        UITabBar.appearance().tintColor = .main
+        UITabBar.appearance().unselectedItemTintColor = .black
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        
+        let navigationBarAppearance = UINavigationBarAppearance()
+        navigationBarAppearance.backgroundColor = .white
+        
+        UINavigationBar.appearance().standardAppearance = navigationBarAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
     }
     
     func createNavController(

@@ -29,6 +29,6 @@ extension UIColor {
     }
     
     static let main = UIColor(hex: "D81D45")
-    static let categoryUnSelected = UIColor(hex: "48454e")
+    static let prograhpyGray = UIColor(hex: "48454e")
     
 }

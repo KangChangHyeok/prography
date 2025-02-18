@@ -20,26 +20,29 @@ final class CategoryTabBar: UIView {
     var nowPlayingButton = UIButton().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.titleLabel?.font = .pretendard(size: 14, weight: .bold)
-        $0.setTitleColor(.categoryUnSelected, for: .normal)
+        $0.setTitleColor(.prograhpyGray, for: .normal)
         $0.setTitleColor(.main, for: .selected)
         $0.setTitle("Now Playing", for: .normal)
         $0.isSelected = true
+        $0.tag = 0
     }
     
     var popularButton = UIButton().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.titleLabel?.font = .pretendard(size: 14, weight: .bold)
-        $0.setTitleColor(.categoryUnSelected, for: .normal)
+        $0.setTitleColor(.prograhpyGray, for: .normal)
         $0.setTitleColor(.main, for: .selected)
         $0.setTitle("Popular", for: .normal)
+        $0.tag = 1
     }
     
     var topRatedButton = UIButton().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.titleLabel?.font = .pretendard(size: 14, weight: .bold)
-        $0.setTitleColor(.categoryUnSelected, for: .normal)
+        $0.setTitleColor(.prograhpyGray, for: .normal)
         $0.setTitleColor(.main, for: .selected)
         $0.setTitle("Top Rated", for: .normal)
+        $0.tag = 2
     }
     
     var highlightBar = UIView().configure {
