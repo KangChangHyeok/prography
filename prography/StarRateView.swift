@@ -30,7 +30,7 @@ final class StarRateView: UIStackView {
     func set(rate: Int) {
         self.arrangedSubviews.enumerated().forEach { index, view in
             if rate == 0 {
-                return
+                (view as? StarImageView)?.isFilled = false
             }
             
             if index <= rate - 1 {

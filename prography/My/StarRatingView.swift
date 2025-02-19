@@ -26,7 +26,7 @@ final class StarRatingView: UIView {
     
     // MARK: - Fillter(All 버튼 클릭시 노출되는 필터)
     
-    private lazy var fillterView = FillterView().configure {
+    lazy var fillterView = FillterView().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.starRateFillterCollectionView.delegate = self
         $0.isHidden = true
