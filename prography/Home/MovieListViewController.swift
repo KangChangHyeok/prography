@@ -18,6 +18,7 @@ class MovieListViewController: UIViewController {
         $0.backgroundColor = .white
         $0.bounces = true
         $0.allowsSelection = false
+        $0.showsVerticalScrollIndicator = false
     }
     
     var movieDataSource: UICollectionViewDiffableDataSource<Int, Int>!

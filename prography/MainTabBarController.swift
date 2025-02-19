@@ -26,6 +26,8 @@ final class MainTabBarController: UITabBarController {
         
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.backgroundColor = .init(hex: "f2f2f7")
+        tabBarAppearance.configureWithOpaqueBackground()
+        tabBarAppearance.shadowColor = .clear
         
         UITabBar.appearance().tintColor = .main
         UITabBar.appearance().unselectedItemTintColor = .black
@@ -34,6 +36,8 @@ final class MainTabBarController: UITabBarController {
         
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = .white
+        navigationBarAppearance.configureWithOpaqueBackground()
+        navigationBarAppearance.shadowColor = .clear
         
         UINavigationBar.appearance().standardAppearance = navigationBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
