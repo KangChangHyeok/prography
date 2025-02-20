@@ -46,9 +46,9 @@ final class MovieDetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         configureLayout()
         configure()
+        
     }
     
     private func configure() {
@@ -57,6 +57,7 @@ final class MovieDetailViewController: UIViewController {
         
         self.navigationItem.titleView = UIImageView(image: .init(named: "Logo"))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "저장", style: .plain, target: self, action: #selector(saveButtonDidTap))
+        tabBarController?.isTabBarHidden = true
     }
     
     private func configureLayout() {
