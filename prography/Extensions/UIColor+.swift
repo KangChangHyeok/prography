@@ -30,5 +30,7 @@ extension UIColor {
     
     static let main = UIColor(hex: "D81D45")
     static let prograhpyGray = UIColor(hex: "48454e")
+    static let placeholderText = UIColor(hex: "b3b3b3")
+    static let movieImageBackground = UIColor(hex: "6F4F56")
     
 }

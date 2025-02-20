@@ -40,4 +40,16 @@ final class StarRateView: UIStackView {
             }
         }
     }
+    
+    func set(width: CGFloat, height: CGFloat) {
+        for index in 0...4 {
+            (self.arrangedSubviews[index] as? StarImageView)?.size = CGSize(width: width, height: height)
+        }
+    }
+    
+    func set(image: UIImage?) {
+        for index in 0...4 {
+            (self.arrangedSubviews[index] as? StarImageView)?.starImage = image
+        }
+    }
 }

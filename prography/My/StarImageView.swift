@@ -9,6 +9,18 @@ import UIKit
 
 final class StarImageView: UIImageView {
     
+    var starImage: UIImage? {
+        didSet {
+            configure(image: starImage)
+        }
+    }
+    
+    var size: CGSize = .init(width: 16, height: 16) {
+        didSet {
+            configure(size: size)
+        }
+    }
+    
     var isFilled: Bool = false {
         didSet {
             configure(isFilled: isFilled)
@@ -38,5 +50,21 @@ final class StarImageView: UIImageView {
     
     private func configure(isFilled: Bool) {
         self.image = isFilled ? .redStar : .grayStar
+    }
+    
+    private func configure(size: CGSize) {
+        
+        NSLayoutConstraint.deactivate(self.constraints)
+        
+        let layoutConstraints: [NSLayoutConstraint] = [
+            self.widthAnchor.constraint(equalToConstant: size.width),
+            self.heightAnchor.constraint(equalToConstant: size.height)
+        ]
+        
+        NSLayoutConstraint.activate(layoutConstraints)
+    }
+    
+    private func configure(image: UIImage?) {
+        self.image = image
     }
 }

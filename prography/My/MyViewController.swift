@@ -24,6 +24,9 @@ final class MyViewController: UIViewController {
     override func viewDidLoad() {
         configureLayout()
         configureDataSource()
+        let backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+            backBarButtonItem.tintColor = .black
+        self.navigationItem.backBarButtonItem = backBarButtonItem
     }
 
 }
@@ -88,6 +91,10 @@ extension MyViewController: UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         starRatingView.fillterView.isHidden = true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        navigationController?.pushViewController(MovieDetailViewController(), animated: true)
     }
 }
 
