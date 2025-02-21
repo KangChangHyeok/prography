@@ -14,7 +14,7 @@ final class GenreCell: UICollectionViewCell {
         $0.font = .pretendard(size: 11, weight: .semibold)
         $0.textColor = .prograhpyGray
         $0.textAlignment = .center
-        $0.text = "Genre"
+        $0.numberOfLines = 1
     }
     
     override init(frame: CGRect) {
@@ -27,13 +27,17 @@ final class GenreCell: UICollectionViewCell {
         contentView.addSubview(genreLabel)
         
         let genreLabelLayoutConstraints: [NSLayoutConstraint] = [
-            genreLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
-            genreLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            genreLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            genreLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            genreLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 2),
+            genreLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 6),
+            genreLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -6),
+            genreLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -2)
         ]
         
         NSLayoutConstraint.activate(genreLabelLayoutConstraints)
+    }
+    
+    func bind(_ genre: String) {
+        genreLabel.text = genre
     }
     
     required init?(coder: NSCoder) {

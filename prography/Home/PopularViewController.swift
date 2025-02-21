@@ -11,6 +11,5 @@ final class PopularViewController: MovieListViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .green
     }
 }

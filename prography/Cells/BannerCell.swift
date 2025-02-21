@@ -65,14 +65,19 @@ final class BannerCell: UICollectionViewCell {
         let descriptionLabelLayout: [NSLayoutConstraint] = [
             descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
             descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            descriptionLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor)
+            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ]
         NSLayoutConstraint.activate(descriptionLabelLayout)
     }
     
-    func bind(title: String, description: String) {
-        titleLabel.text = title
-        descriptionLabel.text = description
+    func bind(_ backdrop: Backdrop) {
+        Task {
+            let (data, _) = try await URLSession.shared.data(from: URL(string: "https://image.tmdb.org/t/p/w300" + backdrop.path)!)
+            let movieImage = UIImage(data: data)
+            movieImageView.image = movieImage
+        }
+        titleLabel.text = backdrop.title
+        descriptionLabel.text = backdrop.overView
     }
 }
 

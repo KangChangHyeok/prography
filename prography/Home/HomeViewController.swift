@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 final class HomeViewController: UIViewController {
     
@@ -14,6 +15,9 @@ final class HomeViewController: UIViewController {
         static let pageHeight = Screen.height - (Screen.statusBarHeight + Screen.navigationBarHeight + Screen.tabBarHeight +  Screen.bottomInset + categoryTabBarHeight)
         static let floatingPointTolerance = 0.1
     }
+    
+    private var viewModel = HomeViewModel()
+    private var cancelables = Set<AnyCancellable>()
     
     private lazy var outerScrollView = UIScrollView().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -37,7 +41,7 @@ final class HomeViewController: UIViewController {
         $0.delegate = self
     }
     
-    private var bannerDataSource: UICollectionViewDiffableDataSource<Int, Int>!
+    private var bannerDataSource: UICollectionViewDiffableDataSource<Int, Backdrop>!
     
     private lazy var categoryTabBar = CategoryTabBar().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -55,7 +59,11 @@ final class HomeViewController: UIViewController {
     }
     private lazy var categoryButtons = [categoryTabBar.nowPlayingButton, categoryTabBar.popularButton, categoryTabBar.topRatedButton]
     
-    private var selectedCategoryTag = 0
+    private var selectedCategoryTag = 0 {
+        didSet {
+            print(selectedCategoryTag)
+        }
+    }
     private var pages: [MovieListViewController] = [NowPlayingViewController(), PopularViewController(), TopRatedViewController()]
     
     private lazy var innerScrollViews = [pages[0].movieCollectionView, pages[1].movieCollectionView, pages[2].movieCollectionView]
@@ -67,14 +75,62 @@ final class HomeViewController: UIViewController {
         view.backgroundColor = .white
         configureLayout()
         configureDataSource()
+        viewModel.send(.viewDidLoad)
+        bindStates()
+        innerScrollViews.forEach { $0.delegate = self }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        tabBarController?.tabBar.isHidden = false
+    }
+    private func bindStates() {
+        viewModel.state.$backdrop
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] backdrop in
+                
+                var snapShot = NSDiffableDataSourceSnapshot<Int, Backdrop>()
+                snapShot.appendSections([0])
+                snapShot.appendItems(backdrop)
+                self?.bannerDataSource.apply(snapShot)
+            }
+            .store(in: &cancelables)
         
-        var snapShot = NSDiffableDataSourceSnapshot<Int, Int>()
-        snapShot.appendSections([0])
-        snapShot.appendItems(Array(0..<5))
-        bannerDataSource.apply(snapShot, animatingDifferences: false)
-        innerScrollViews.forEach {
-            $0.delegate = self
-        }
+        viewModel.state.$nowPlayingMovies
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] movies in
+                
+                var snapShot = NSDiffableDataSourceSnapshot<Int, Movie>()
+                snapShot.appendSections([0])
+                snapShot.appendItems(movies)
+                self?.pages[0].movieDataSource?.apply(snapShot)
+            }
+            .store(in: &cancelables)
+        
+        viewModel.state.$popularMovies
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] movies in
+                
+                var snapShot = NSDiffableDataSourceSnapshot<Int, Movie>()
+                snapShot.appendSections([0])
+                snapShot.appendItems(movies)
+                self?.pages[1].movieDataSource?.apply(snapShot)
+            }
+            .store(in: &cancelables)
+        
+        viewModel.state.$topRatedMovies
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] movies in
+                
+                var snapShot = NSDiffableDataSourceSnapshot<Int, Movie>()
+                snapShot.appendSections([0])
+                snapShot.appendItems(movies)
+                self?.pages[2].movieDataSource?.apply(snapShot)
+            }
+            .store(in: &cancelables)
     }
 }
 
@@ -143,18 +199,17 @@ private extension HomeViewController {
     }
     
     func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<BannerCell, Int> { cell, _, commentID in
-            cell.bind(title: "Title", description: "Description")
+        let cellRegistration = UICollectionView.CellRegistration<BannerCell, Backdrop> { cell, _, backdrop in
+            cell.bind(backdrop)
         }
         
-        bannerDataSource = UICollectionViewDiffableDataSource<Int, Int>(collectionView: bannerCollectionView) { collectionView, indexPath, item in
+        bannerDataSource = UICollectionViewDiffableDataSource<Int, Backdrop>(collectionView: bannerCollectionView) { collectionView, indexPath, item in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         }
     }
     
     @objc func CategoryButtonDidTap(sender: UIButton) {
         highlightBarAnimation(sender: sender)
-        
         guard let index = categoryButtons.firstIndex(where: { $0 === sender }) else { return }
         
         if selectedCategoryTag < sender.tag {
@@ -163,6 +218,8 @@ private extension HomeViewController {
             pageViewController.setViewControllers([pages[index]], direction: .reverse, animated: true)
         }
         selectedCategoryTag = sender.tag
+        
+        viewModel.send(.categoryButtonDidTap(selectedCategoryTag))
     }
     
     func highlightBarAnimation(sender: UIButton) {
@@ -196,13 +253,15 @@ extension HomeViewController: UIPageViewControllerDataSource {
         _ pageViewController: UIPageViewController,
         viewControllerBefore viewController: UIViewController
     ) -> UIViewController? {
-        guard let index = pages.firstIndex(of: viewController as! MovieListViewController) else { return nil }
+        guard let index = pages.firstIndex(of: viewController as! MovieListViewController) else {
+            return nil
+        }
         let previousIndex = index - 1
         
-        guard previousIndex < 0 else {
-            return pages[previousIndex]
+        guard previousIndex != -1 else {
+            return nil
         }
-        return nil
+        return pages[previousIndex]
     }
     
     func pageViewController(
@@ -210,13 +269,14 @@ extension HomeViewController: UIPageViewControllerDataSource {
         viewControllerAfter viewController: UIViewController
     ) -> UIViewController? {
         guard let index = pages.firstIndex(of: viewController as! MovieListViewController) else { return nil }
-
         let nextIndex = index + 1
-        if nextIndex == pages.count {
+        
+        guard nextIndex != 3 else {
             return nil
         }
         return pages[nextIndex]
     }
+    
 }
 
 extension HomeViewController: UIPageViewControllerDelegate {
@@ -229,6 +289,8 @@ extension HomeViewController: UIPageViewControllerDelegate {
         guard completed else { return }
         guard let currentViewController = pageViewController.viewControllers?.first else { return }
         guard let index = pages.firstIndex(of: currentViewController as! MovieListViewController) else { return }
+        selectedCategoryTag = index
+        viewModel.send(.scrolledPage(selectedCategoryTag))
         highlightBarAnimation(sender: categoryButtons[index])
     }
 }
@@ -243,11 +305,19 @@ extension HomeViewController: UICollectionViewDelegate, UIScrollViewDelegate {
         let innerScroll = !outerScroll
         let moreScroll = scrollView.panGestureRecognizer.translation(in: scrollView).y < 0
         let lessScroll = !moreScroll
-        let innerScrollView = innerScrollViews[selectedCategoryTag]
+        
+        var innerScrollView = innerScrollViews[selectedCategoryTag]
+        if selectedCategoryTag == -1 {
+            innerScrollView = innerScrollViews[0]
+        }
         
         // outer scroll이 스크롤 할 수 있는 최대값 (이 값을 sticky header 뷰가 있다면 그 뷰의 frame.maxY와 같은 값으로 사용해도 가능)
         let outerScrollMaxOffsetY = outerScrollView.contentSize.height - outerScrollView.frame.height
         let innerScrollMaxOffsetY = innerScrollView.contentSize.height - innerScrollView.frame.height
+        
+        if innerScrollView.contentOffset.y >= innerScrollMaxOffsetY {
+            viewModel.send(.scrollToBottom(selectedCategoryTag))
+        }
         
         // 1. outer scroll을 more 스크롤
         // 만약 outer scroll을 more scroll 다 했으면, inner scroll을 more scroll
@@ -308,23 +378,9 @@ extension HomeViewController: UICollectionViewDelegate, UIScrollViewDelegate {
             innerScrollView.contentOffset.y = 0
         }
     }
-}
-
-#Preview {
-    HomeViewController()
-}
-
-private struct AssociatedKeys {
-    static var lastOffsetY = "lastOffsetY"
-}
-
-extension UIScrollView {
-    var lastOffsetY: CGFloat {
-        get {
-            (objc_getAssociatedObject(self, &AssociatedKeys.lastOffsetY) as? CGFloat) ?? contentOffset.y
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.lastOffsetY, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let detailViewController = MovieDetailViewController()
+        self.navigationController?.pushViewController(detailViewController, animated: true)
     }
 }

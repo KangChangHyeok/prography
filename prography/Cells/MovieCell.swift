@@ -21,7 +21,7 @@ final class MovieCell: UICollectionViewCell {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.layer.masksToBounds = true
         $0.layer.cornerRadius = 16
-        $0.backgroundColor = .black
+        $0.contentMode = .scaleToFill
     }
     
     private let titleLabel = UILabel().configure {
@@ -56,36 +56,48 @@ final class MovieCell: UICollectionViewCell {
         $0.backgroundColor = .white
     }
     
-    private var genreDataSource: UICollectionViewDiffableDataSource<Int, Int>!
+    private var genreDataSource: UICollectionViewDiffableDataSource<Int, String>!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureLayout()
         configureDataSource()
-        
-        var snapShot = NSDiffableDataSourceSnapshot<Int, Int>()
-        snapShot.appendSections([0])
-        snapShot.appendItems(Array(0..<4))
-        genreDataSource.apply(snapShot)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func bind(_ movie: Movie) {
+        Task {
+            let (data, _) = try await URLSession.shared.data(from: URL(string: "https://image.tmdb.org/t/p/w200" + movie.posterImagePath)!)
+            let movieImage = UIImage(data: data)
+            movieImageView.image = movieImage
+        }
+                
+        titleLabel.text = movie.title
+        descriptionLabel.text = movie.overView
+        rateLabel.text = movie.voteAverage.description
+        
+        var snapshot = NSDiffableDataSourceSnapshot<Int, String>()
+        snapshot.appendSections([0])
+        snapshot.appendItems(movie.genres)
+        genreDataSource.apply(snapshot)
     }
 }
 
 private extension MovieCell {
     
     func genreCollectionViewLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+        let itemSize = NSCollectionLayoutSize(widthDimension: .estimated(40), heightDimension: .estimated(16))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(40), heightDimension: .absolute(16))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .estimated(40), heightDimension: .estimated(16))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
-        section.interGroupSpacing = 3.33
+        section.interGroupSpacing = 5
         let layout = UICollectionViewCompositionalLayout(section: section)
         return layout
     }
@@ -103,7 +115,7 @@ private extension MovieCell {
         NSLayoutConstraint.activate(movieImageViewLayoutConstraints)
         
         let genreCollectionViewLayoutConstraints: [NSLayoutConstraint] = [
-            genreCollectionView.heightAnchor.constraint(equalToConstant: 16)
+            genreCollectionView.heightAnchor.constraint(equalToConstant: 18)
         ]
         
         NSLayoutConstraint.activate(genreCollectionViewLayoutConstraints)
@@ -113,18 +125,19 @@ private extension MovieCell {
         let containerStackViewLayoutConstraints: [NSLayoutConstraint] = [
             containerStackView.centerYAnchor.constraint(equalTo: movieImageView.centerYAnchor),
             containerStackView.leadingAnchor.constraint(equalTo: movieImageView.trailingAnchor, constant: 16),
-            containerStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            containerStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            containerStackView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -5)
         ]
         NSLayoutConstraint.activate(containerStackViewLayoutConstraints)
     }
     
     func configureDataSource() {
-        let cellRegistaration = UICollectionView.CellRegistration<GenreCell, Int> { cell, indexPath, item in
-            
+        let cellRegistaration = UICollectionView.CellRegistration<GenreCell, String> { cell, indexPath, genre in
+            cell.bind(genre)
         }
         
-        genreDataSource = UICollectionViewDiffableDataSource<Int, Int>(collectionView: genreCollectionView, cellProvider: { collectionView, indexPath, itemIdentifier in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: itemIdentifier)
+        genreDataSource = UICollectionViewDiffableDataSource<Int, String>(collectionView: genreCollectionView, cellProvider: { collectionView, indexPath, genre in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: genre)
         })
         
     }

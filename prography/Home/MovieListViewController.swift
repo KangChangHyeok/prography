@@ -17,22 +17,24 @@ class MovieListViewController: UIViewController {
         $0.showsHorizontalScrollIndicator = false
         $0.backgroundColor = .white
         $0.bounces = true
-        $0.allowsSelection = false
         $0.showsVerticalScrollIndicator = false
     }
     
-    var movieDataSource: UICollectionViewDiffableDataSource<Int, Int>!
+    var movieDataSource: UICollectionViewDiffableDataSource<Int, Movie>!
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        configureDataSource()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         configureLayout()
-        configureDataSource()
-        
-        var snapshot = NSDiffableDataSourceSnapshot<Int, Int>()
-        snapshot.appendSections([0])
-        snapshot.appendItems(Array(0..<10))
-        movieDataSource.apply(snapshot)
     }
 }
 
@@ -65,12 +67,13 @@ private extension MovieListViewController {
     }
     
     func configureDataSource() {
-        let cellRegistaration = UICollectionView.CellRegistration<MovieCell, Int> { cell, indexPath, movie in
-            
+        print(#function)
+        let cellRegistaration = UICollectionView.CellRegistration<MovieCell, Movie> { cell, indexPath, movie in
+            cell.bind(movie)
         }
         
-        movieDataSource = UICollectionViewDiffableDataSource<Int, Int>(collectionView: movieCollectionView) { collectionView, indexPath, movieId in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: movieId)
+        movieDataSource = UICollectionViewDiffableDataSource<Int, Movie>(collectionView: movieCollectionView) { collectionView, indexPath, movie in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: movie)
         }
     }
 }
