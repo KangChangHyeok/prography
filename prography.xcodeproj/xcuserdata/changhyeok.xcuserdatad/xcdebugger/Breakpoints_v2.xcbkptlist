@@ -14,9 +14,9 @@
             filePath = "prography/CoreDataManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "83"
-            endingLineNumber = "83"
-            landmarkName = "deleteData(movieID:)"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
+            landmarkName = "fetchReviews()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -50,6 +50,52 @@
             endingLineNumber = "71"
             landmarkName = "perform(_:)"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "47E02F1D-14F3-473E-A5C8-20D8F8DE9AB1"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "prography/Sources/My/MyViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "bindStates()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "47E02F1D-14F3-473E-A5C8-20D8F8DE9AB1 - 3b1ed0d5ee1379d6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "prography.MyViewController.bindStates() -&gt; ()"
+                  moduleName = "prography.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/changhyeok/Desktop/prography/prography/Sources/My/MyViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "65"
+                  endingLineNumber = "65">
+               </Location>
+               <Location
+                  uuid = "47E02F1D-14F3-473E-A5C8-20D8F8DE9AB1 - 49c6b2b040156950"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Swift.Int&gt;) -&gt; () in prography.MyViewController.bindStates() -&gt; ()"
+                  moduleName = "prography.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/changhyeok/Desktop/prography/prography/Sources/My/MyViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "65"
+                  endingLineNumber = "65">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
