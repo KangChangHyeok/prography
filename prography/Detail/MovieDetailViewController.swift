@@ -53,8 +53,23 @@ final class MovieDetailViewController: UIViewController {
         $0.menu = menu
     }
     
-    lazy var editAction = UIAction(title: "수정하기", image: nil) { _ in
-        print("📝 수정하기 선택됨")
+    private lazy var editButton = UIButton().configure {
+        $0.setTitle("저장", for: .normal)
+        $0.setTitleColor(.systemBlue, for: .normal)
+        $0.addTarget(self, action: #selector(saveButtonDidTap), for: .touchUpInside)
+    }
+    
+    lazy var editAction = UIAction(title: "수정하기", image: nil) { [weak self] _ in
+        self?.commentView.commentTextView.isEditable = true
+        self?.commentView.commentTextView.layer.borderWidth = 1
+        self?.commentView.commentTextView.layer.borderColor = UIColor.main.cgColor
+        self?.commentView.commentTextView.backgroundColor = .white
+        self?.commentView.dateLabel.isHidden = true
+        
+        self?.movieStarRateView.set(isEdit: true)
+        guard let self else { return}
+        self.navigationItem.rightBarButtonItem = .init(customView: self.editButton)
+        
     }
     
     lazy var deleteAction = UIAction(title: "삭제하기", image: nil, attributes: .destructive) { [weak self] _ in
@@ -91,7 +106,7 @@ final class MovieDetailViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         self.navigationItem.titleView = UIImageView(image: .init(named: "Logo"))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "저장", style: .plain, target: self, action: #selector(saveButtonDidTap))
+        self.navigationItem.rightBarButtonItem = .init(customView: editButton)
         tabBarController?.tabBar.isHidden = true
     }
     
@@ -209,7 +224,7 @@ final class MovieDetailViewController: UIViewController {
     
     @objc private func saveButtonDidTap() {
         guard (commentView.commentTextView.text != "후기를 작성해주세요.") || (commentView.commentTextView.text.isEmpty != false) else {
-            print("코멘트를 작성해 주세요.")
+            self.presentCheckAlert(title: "코멘트를 작성해주세요.")
             return
         }
         
@@ -217,9 +232,13 @@ final class MovieDetailViewController: UIViewController {
             movieID: viewModel.state.movieID,
             movieImage: movieImageView.image?.pngData(),
             movieTitle: viewModel.state.movieDetail?.title,
-            rate: Int(trunc(viewModel.state.movieDetail!.voteAverage / 2)),
+            rate: movieStarRateView.currentRate,
             comment: commentView.commentTextView.text
         )
+        
+        self.presentCheckAlert(title: "리뷰 작성이 완료되었습니다.") { [weak self] _ in
+            self?.navigationController?.popViewController(animated: true)
+        }
     }
 }
 

@@ -31,7 +31,7 @@ final class CommentView: UIView {
         $0.delegate = self
     }
     
-    private var dateLabel = UILabel().configure {
+    var dateLabel = UILabel().configure {
         $0.font = .pretendard(size: 11, weight: .regular)
         $0.isHidden = true
         $0.textColor = .black

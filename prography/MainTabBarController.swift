@@ -16,8 +16,10 @@ final class MainTabBarController: UITabBarController {
             imageName: "House",
             selectedImageName: "RedHouse"
         )
+        
+        let myViewModel = MyViewModel()
         let MyNavController = createNavController(
-            for: MyViewController(),
+            for: MyViewController(viewModel: myViewModel),
             title: "My",
             imageName: "Star",
             selectedImageName: "RedStar"

@@ -37,23 +37,44 @@ class CoreDataManager {
     }
     
     func saveData(movieID: Int, movieImage: Data?, movieTitle: String?, rate: Int, comment: String) {
-        guard let entity = NSEntityDescription.entity(forEntityName: "Review", in: context) else { return }
+        // movieID에 해당하는 데이터를 가져오기 위한 Fetch Request
+        let fetchRequest: NSFetchRequest<Review> = Review.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "movieID == %d", movieID)
         
-        let object = NSManagedObject(entity: entity, insertInto: context)
-        object.setValue(movieImage, forKey: "movieImage")
-        object.setValue(movieTitle, forKey: "movieTitle")
-        object.setValue(comment, forKey: "comment")
-        object.setValue(Date.now, forKey: "date")
-        object.setValue(movieID, forKey: "movieID")
-        object.setValue(rate, forKey: "rate")
         do {
+            // 데이터 가져오기
+            let results = try context.fetch(fetchRequest)
+            
+            if let existingReview = results.first {
+                // 기존 데이터가 있다면 덮어쓰기
+                existingReview.movieImage = movieImage
+                existingReview.movieTitle = movieTitle
+                existingReview.comment = comment
+                existingReview.date = Date.now
+                existingReview.rate = Int64(rate)
+                print("기존 리뷰 덮어쓰기 완료")
+            } else {
+                // 기존 데이터가 없다면 새로운 데이터 추가
+                guard let entity = NSEntityDescription.entity(forEntityName: "Review", in: context) else { return }
+                let newReview = NSManagedObject(entity: entity, insertInto: context)
+                newReview.setValue(movieImage, forKey: "movieImage")
+                newReview.setValue(movieTitle, forKey: "movieTitle")
+                newReview.setValue(comment, forKey: "comment")
+                newReview.setValue(Date.now, forKey: "date")
+                newReview.setValue(movieID, forKey: "movieID")
+                newReview.setValue(rate, forKey: "rate")
+                print("새로운 리뷰 저장 완료")
+            }
+            
+            // 변경사항 저장
             try context.save()
             print("리뷰 저장 완료")
+            
         } catch {
+            // 에러 처리
             print("error: \(error.localizedDescription)")
         }
     }
-    
     func fetchReviews() -> [Review]? {
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Review")
         

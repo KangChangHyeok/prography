@@ -6,11 +6,16 @@
 //
 
 import UIKit
+import Combine
 
 final class MyViewController: UIViewController {
     
-    private var starRatingView = StarRatingView().configure {
+    private var viewModel: MyViewModel
+    private var cancelables = Set<AnyCancellable>()
+    
+    private lazy var starRatingView = StarRatingView().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.bind(viewModel: self.viewModel)
     }
     
     private lazy var reviewedMovieCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createReviewedMovieCollectionViewLayout()).configure {
@@ -21,9 +26,19 @@ final class MyViewController: UIViewController {
     
     private var reviewedMovieDataSource: UICollectionViewDiffableDataSource<Int, Review>!
     
+    init(viewModel: MyViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         configureLayout()
         configureDataSource()
+        bindStates()
         let backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
             backBarButtonItem.tintColor = .black
         self.navigationItem.backBarButtonItem = backBarButtonItem
@@ -31,12 +46,42 @@ final class MyViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         tabBarController?.tabBar.isHidden = false
-        guard let reviews = CoreDataManager.shared.fetchReviews() else { return }
+        viewModel.send(.viewWillAppear)
+    }
+    
+    private func bindStates() {
+        viewModel.state.$reviews
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] reviews in
+                var snapShot = NSDiffableDataSourceSnapshot<Int, Review>()
+                snapShot.appendSections([0])
+                snapShot.appendItems(reviews)
+                self?.reviewedMovieDataSource.apply(snapShot)
+            }
+            .store(in: &cancelables)
         
-        var snapShot = NSDiffableDataSourceSnapshot<Int, Review>()
-        snapShot.appendSections([0])
-        snapShot.appendItems(reviews)
-        reviewedMovieDataSource.apply(snapShot)
+        viewModel.state.$showMovieDetailViewController
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] movieID in
+                guard let movieID else { return }
+                let viewModel = MovieDetailViewModel(movieID: movieID)
+                let viewController = MovieDetailViewController(viewModel: viewModel)
+                self?.navigationController?.pushViewController(viewController, animated: true)
+            }
+            .store(in: &cancelables)
+        
+        viewModel.state.$fillterReviews
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] reviews in
+                var snapShot = NSDiffableDataSourceSnapshot<Int, Review>()
+                snapShot.appendSections([0])
+                snapShot.appendItems(reviews)
+                self?.reviewedMovieDataSource.apply(snapShot)
+            }
+            .store(in: &cancelables)
     }
 
 }
@@ -90,6 +135,7 @@ private extension MyViewController {
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: movieId)
         }
     }
+    
 }
 
 extension MyViewController: UICollectionViewDelegate {
@@ -99,6 +145,7 @@ extension MyViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.send(.selectedMovie(indexPath.row))
     }
 }
 

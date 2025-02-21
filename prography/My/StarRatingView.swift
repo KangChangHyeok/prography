@@ -9,16 +9,18 @@ import UIKit
 
 final class StarRatingView: UIView {
     
+    private var viewModel: MyViewModel?
+    
     private lazy var containerStackView = UIStackView(
         arrangedSubviews: [selectedStarRatingView, fillterView]
     ).configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.axis = .vertical
         $0.isUserInteractionEnabled = true
-
+        
     }
     
-    private lazy var selectedStarRatingView = SelectedStarRatingView().configure {
+    lazy var selectedStarRatingView = SelectedStarRatingView().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(selectedStarRatingViewDidTap))
         $0.addGestureRecognizer(tapGestureRecognizer)
@@ -39,6 +41,10 @@ final class StarRatingView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func bind(viewModel: MyViewModel) {
+        self.viewModel = viewModel
     }
 }
 
@@ -63,8 +69,11 @@ private extension StarRatingView {
         NSLayoutConstraint.activate(containerStackViewLayoutConstraints)
     }
     
+    
+    
     @objc func selectedStarRatingViewDidTap() {
         fillterView.isHidden.toggle()
+        
     }
 }
 
@@ -74,5 +83,6 @@ extension StarRatingView: UICollectionViewDelegate {
         fillterView.isHidden = true
         let starRate = collectionView.cellForItem(at: indexPath)?.tag
         selectedStarRatingView.starRate = starRate!
+        viewModel?.send(.selectedFillter(selectedStarRatingView.starRate))
     }
 }
