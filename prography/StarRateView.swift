@@ -9,21 +9,27 @@ import UIKit
 
 final class StarRateView: UIStackView {
     
-    init() {
+    var currentRate: Int = 0
+    
+    init(isEdit: Bool) {
         super.init(frame: .zero)
-        configure()
+        configure(isEdit: isEdit)
     }
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configure() {
+    private func configure(isEdit: Bool) {
         self.translatesAutoresizingMaskIntoConstraints = false
         self.spacing = 4
         self.axis = .horizontal
         for _ in 1...5 {
             self.addArrangedSubview(StarImageView(isFilled: false))
+        }
+        
+        if isEdit {
+            configureGesture()
         }
     }
     
@@ -52,4 +58,27 @@ final class StarRateView: UIStackView {
             (self.arrangedSubviews[index] as? StarImageView)?.starImage = image
         }
     }
+    
+    func set(isEdit: Bool) {
+            self.isUserInteractionEnabled = isEdit
+    }
+    
+    private func configureGesture() {
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+            self.addGestureRecognizer(tapGesture)
+            self.isUserInteractionEnabled = true
+    }
+    
+    @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
+            let touchLocation = gesture.location(in: self)
+            
+            // 터치한 별을 찾기
+            for (index, view) in self.arrangedSubviews.enumerated() {
+                if view.frame.contains(touchLocation) {
+                    set(rate: index + 1)
+                    self.currentRate = index + 1
+                    break
+                }
+            }
+        }
 }

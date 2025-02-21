@@ -20,7 +20,7 @@ final class MovieTitleLabel: UILabel {
     
     private func configure() {
         self.translatesAutoresizingMaskIntoConstraints = false
-        self.numberOfLines = 1
+        self.numberOfLines = 0
         self.textAlignment = .left
         self.textColor = .black
     }

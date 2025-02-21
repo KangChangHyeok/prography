@@ -6,7 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		63D1A7E52D6836D2003786D8 /* Review+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D1A7E42D6836D2003786D8 /* Review+CoreDataProperties.swift */; };
+		63D1A7E62D6836D2003786D8 /* Review+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D1A7E32D6836D2003786D8 /* Review+CoreDataClass.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		63D1A7E32D6836D2003786D8 /* Review+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Review+CoreDataClass.swift"; sourceTree = "<group>"; };
+		63D1A7E42D6836D2003786D8 /* Review+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Review+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		63D34A812D62C29600455717 /* prography.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = prography.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -45,6 +52,8 @@
 		63D34A782D62C29600455717 = {
 			isa = PBXGroup;
 			children = (
+				63D1A7E32D6836D2003786D8 /* Review+CoreDataClass.swift */,
+				63D1A7E42D6836D2003786D8 /* Review+CoreDataProperties.swift */,
 				63D34A832D62C29600455717 /* prography */,
 				63D34A822D62C29600455717 /* Products */,
 			);
@@ -132,6 +141,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63D1A7E52D6836D2003786D8 /* Review+CoreDataProperties.swift in Sources */,
+				63D1A7E62D6836D2003786D8 /* Review+CoreDataClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

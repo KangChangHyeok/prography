@@ -19,7 +19,7 @@ final class MyViewController: UIViewController {
         $0.delegate = self
     }
     
-    private var reviewedMovieDataSource: UICollectionViewDiffableDataSource<Int, Int>!
+    private var reviewedMovieDataSource: UICollectionViewDiffableDataSource<Int, Review>!
     
     override func viewDidLoad() {
         configureLayout()
@@ -31,6 +31,12 @@ final class MyViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         tabBarController?.tabBar.isHidden = false
+        guard let reviews = CoreDataManager.shared.fetchReviews() else { return }
+        
+        var snapShot = NSDiffableDataSourceSnapshot<Int, Review>()
+        snapShot.appendSections([0])
+        snapShot.appendItems(reviews)
+        reviewedMovieDataSource.apply(snapShot)
     }
 
 }
@@ -76,18 +82,13 @@ private extension MyViewController {
     }
     
     func configureDataSource() {
-        let cellRegistaration = UICollectionView.CellRegistration<ReviewedMovieCell, Int> { cell, indexPath, movieId in
-            
+        let cellRegistaration = UICollectionView.CellRegistration<ReviewedMovieCell, Review> { cell, indexPath, review in
+            cell.bind(review)
         }
         
-        reviewedMovieDataSource = UICollectionViewDiffableDataSource<Int, Int>(collectionView: reviewedMovieCollectionView) { collectionView, indexPath, movieId in
+        reviewedMovieDataSource = UICollectionViewDiffableDataSource<Int, Review>(collectionView: reviewedMovieCollectionView) { collectionView, indexPath, movieId in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: movieId)
         }
-        
-        var snapshot = NSDiffableDataSourceSnapshot<Int, Int>()
-        snapshot.appendSections([0])
-        snapshot.appendItems(Array(0...25))
-        reviewedMovieDataSource.apply(snapshot)
     }
 }
 
@@ -98,10 +99,7 @@ extension MyViewController: UICollectionViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        navigationController?.pushViewController(MovieDetailViewController(), animated: true)
     }
 }
 
-#Preview {
-    MyViewController()
-}
+

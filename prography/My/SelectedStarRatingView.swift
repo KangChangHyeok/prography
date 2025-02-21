@@ -22,7 +22,7 @@ final class SelectedStarRatingView: UIView {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
-    private let starRateView = StarRateView().configure {
+    private let starRateView = StarRateView(isEdit: false).configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.isHidden = false
     }

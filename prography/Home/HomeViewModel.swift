@@ -15,6 +15,8 @@ enum HomeViewModelInput {
     case scrolledPage(Int)
     case categoryButtonDidTap(Int)
     case scrollToBottom(Int)
+    case backdropImageDidTap(Int, Int)
+    case movieSelected(Int, Int)
 }
 
 //MARK: - Action
@@ -24,16 +26,18 @@ enum HomeViewModelAction {
     case fetchPopularMovies(Int)
     case fetchTopRatedMovies(Int)
     case fetchSelectedCategoryMoviesBackdrop(Int)
+    case showMovieDetailViewController(Int)
 }
 
 //MARK: - State
 
-class HomeViewModelState {
+final class HomeViewModelState {
     
     @Published var backdrop: [Backdrop] = []
     @Published var nowPlayingMovies: [Movie] = []
     @Published var popularMovies: [Movie] = []
     @Published var topRatedMovies: [Movie] = []
+    @Published var showMovieDetailViewController: Int?
     
     fileprivate var nowPlayingMoviesPage = 1
     fileprivate var popularMoviesPage = 1
@@ -70,6 +74,21 @@ final class HomeViewModel: ViewModelProtocol {
             case 1: return [.fetchPopularMovies(state.popularMoviesPage)]
             case 2: return [.fetchTopRatedMovies(state.topRatedMoviesPage)]
             default: return [.fetchNowPlayingMovies(state.popularMoviesPage)]
+            }
+        case .movieSelected(let pageTag, let index):
+            switch pageTag {
+            case 0: return [ .showMovieDetailViewController(state.nowPlayingMovies[index].movieID)]
+            case 1: return [ .showMovieDetailViewController(state.popularMovies[index].movieID)]
+            case 2: return [ .showMovieDetailViewController(state.topRatedMovies[index].movieID)]
+            default: return [ .showMovieDetailViewController(state.nowPlayingMovies[index].movieID)]
+            }
+            
+        case .backdropImageDidTap(let pageTag, let index):
+            switch pageTag {
+            case 0: return [ .showMovieDetailViewController(state.nowPlayingMovieBackdrops[index].movieID)]
+            case 1: return [ .showMovieDetailViewController(state.popularMovieBackdrops[index].movieID)]
+            case 2: return [ .showMovieDetailViewController(state.topRatedMovieBackdrops[index].movieID)]
+            default: return [ .showMovieDetailViewController(state.nowPlayingMovies[index].movieID)]
             }
         }
     }
@@ -177,6 +196,8 @@ final class HomeViewModel: ViewModelProtocol {
                 state.backdrop = state.topRatedMovieBackdrops
             default: break
             }
+        case .showMovieDetailViewController(let index):
+            state.showMovieDetailViewController = index
         }
     }
 }

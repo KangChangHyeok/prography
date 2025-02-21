@@ -17,7 +17,7 @@ final class CommentView: UIView {
         $0.textAlignment = .left
     }
     
-    private lazy var commentTextView = UITextView().configure {
+    lazy var commentTextView = UITextView().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.text = "후기를 작성해주세요."
         $0.font = .pretendard(size: 16, weight: .medium)
@@ -27,8 +27,16 @@ final class CommentView: UIView {
         $0.layer.masksToBounds = true
         $0.layer.borderColor = UIColor.main.cgColor
         $0.contentInset = .init(top: 12, left: 16, bottom: 12, right: 16)
-        $0.textContainerInset = .init(top: 0, left: 0, bottom: 0, right: 0)
+        $0.textContainerInset = .init(top: 0, left: 0, bottom: 16, right: 0)
         $0.delegate = self
+    }
+    
+    private var dateLabel = UILabel().configure {
+        $0.font = .pretendard(size: 11, weight: .regular)
+        $0.isHidden = true
+        $0.textColor = .black
+        $0.numberOfLines = 1
+        $0.translatesAutoresizingMaskIntoConstraints = false
     }
     
     override init(frame: CGRect) {
@@ -63,6 +71,31 @@ final class CommentView: UIView {
         ]
         
         NSLayoutConstraint.activate(commentTextViewLayoutConstraints)
+        
+        self.addSubview(dateLabel)
+        
+        let dateLabelLayoutConstraints: [NSLayoutConstraint] = [
+            dateLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -16),
+            dateLabel.trailingAnchor.constraint(equalTo: commentTextView.trailingAnchor, constant: -32)
+        ]
+        
+        NSLayoutConstraint.activate(dateLabelLayoutConstraints)
+    }
+    
+    func bind(_ comment: String?, date: Date?) {
+        commentTextView.text = comment
+        
+        commentTextView.layer.borderWidth = 0
+        commentTextView.backgroundColor = .init(hex: "EDBAC5").withAlphaComponent(0.2)
+        commentTextView.textColor = .black
+        commentTextView.isEditable = false
+        
+        let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            formatter.locale = Locale(identifier: "ko_KR") // 한국 시간 기준
+            
+        dateLabel.isHidden = false
+        dateLabel.text = formatter.string(from: date!)
     }
 }
 

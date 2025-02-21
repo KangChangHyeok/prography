@@ -78,6 +78,10 @@ final class HomeViewController: UIViewController {
         viewModel.send(.viewDidLoad)
         bindStates()
         innerScrollViews.forEach { $0.delegate = self }
+        
+        let backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+            backBarButtonItem.tintColor = .black
+        self.navigationItem.backBarButtonItem = backBarButtonItem
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -129,6 +133,17 @@ final class HomeViewController: UIViewController {
                 snapShot.appendSections([0])
                 snapShot.appendItems(movies)
                 self?.pages[2].movieDataSource?.apply(snapShot)
+            }
+            .store(in: &cancelables)
+        
+        viewModel.state.$showMovieDetailViewController
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] movieID in
+                guard let movieID else { return }
+                let viewModel = MovieDetailViewModel(movieID: movieID)
+                let viewController = MovieDetailViewController(viewModel: viewModel)
+                self?.navigationController?.pushViewController(viewController, animated: true)
             }
             .store(in: &cancelables)
     }
@@ -380,7 +395,10 @@ extension HomeViewController: UICollectionViewDelegate, UIScrollViewDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailViewController = MovieDetailViewController()
-        self.navigationController?.pushViewController(detailViewController, animated: true)
+        if collectionView === bannerCollectionView {
+            viewModel.send(.backdropImageDidTap(selectedCategoryTag, indexPath.row))
+        } else {
+            viewModel.send(.movieSelected(selectedCategoryTag, indexPath.row))
+        }
     }
 }

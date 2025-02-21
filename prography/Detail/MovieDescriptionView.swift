@@ -24,7 +24,7 @@ final class MovieDescriptionView: UIView {
         $0.backgroundColor = .white
     }
     
-    private var genreDataSource: UICollectionViewDiffableDataSource<Int, Int>!
+    private var genreDataSource: UICollectionViewDiffableDataSource<Int, String>!
     
     private var descriptionLabel = UILabel().configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -32,17 +32,7 @@ final class MovieDescriptionView: UIView {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.minimumLineHeight = 24
         paragraphStyle.maximumLineHeight = 24
-        
-        let attributedString = NSAttributedString(
-            string: """
-        너클즈, 테일즈와 함께 평화로운 일상을 보내던 초특급 히어로 소닉. 연구 시설에 50년간 잠들어 있던 사상 최강의 비밀 병기 \"섀도우\"가 탈주하자, 세계 수호 통합 부대(약칭 세.수.통)에 의해 극비 소집된다. 소중한 것을 잃은 분노와 복수심에 불타는 섀도우는 소닉의 초고속 스피드와 너클즈의 최강 펀치를 단 단숨에 제압해버린다. 세상을 지배하려는 닥터 로보트닉과 그의 할아버지 제럴드 박사는 섀도우의 엄청난 힘 카오스 에너지를 이용해 인류를 정복하려고 하는데… 너클즈, 테일즈와 함께 평화로운 일상을 보내던 초특급 히어로 소닉. 연구 시설에 50년간 잠들어 있던 사상 최강의 비밀 병기 \"섀도우\"가 탈주하자, 세계 수호 통합 부대(약칭 세.수.통)에 의해 극비 소집된다. 소중한 것을 잃은 분노와 복수심에 불타는 섀도우는 소닉의 초고속 스피드와 너클즈의 최강 펀치를 단 단숨에 제압해버린다. 세상을 지배하려는 닥터 로보트닉과 그의 할아버지 제럴드 박사는 섀도우의 엄청난 힘 카오스 에너지를 이용해 인류를 정복하려고 하는데…
-        """,
-            attributes: [
-                .paragraphStyle: paragraphStyle,
-                .font: UIFont.pretendard(size: 16, weight: .medium)
-            ]
-        )
-        $0.attributedText = attributedString
+        paragraphStyle.lineSpacing = 3
     }
     
     init() {
@@ -57,21 +47,21 @@ final class MovieDescriptionView: UIView {
     }
     
     
-    func genreCollectionViewLayout() -> UICollectionViewLayout {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+    private func genreCollectionViewLayout() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .estimated(40), heightDimension: .estimated(16))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(40), heightDimension: .absolute(16))
+        let groupSize = NSCollectionLayoutSize(widthDimension: .estimated(40), heightDimension: .estimated(16))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .continuous
-        section.interGroupSpacing = 3.33
+        section.interGroupSpacing = 5
         let layout = UICollectionViewCompositionalLayout(section: section)
         return layout
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         self.addSubview(titleLabel)
         
         let titleLabelLayoutConstraints: [NSLayoutConstraint] = [
@@ -87,7 +77,7 @@ final class MovieDescriptionView: UIView {
         let genreCollectionViewLayoutConstraints: [NSLayoutConstraint] = [
             genreCollectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
             genreCollectionView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            genreCollectionView.heightAnchor.constraint(equalToConstant: 16),
+            genreCollectionView.heightAnchor.constraint(equalToConstant: 18),
             genreCollectionView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         ]
         
@@ -105,19 +95,25 @@ final class MovieDescriptionView: UIView {
         NSLayoutConstraint.activate(descriptionLabelLayoutConstraints)
     }
     
-    func configureDataSource() {
-        let cellRegistaration = UICollectionView.CellRegistration<GenreCell, Int> { cell, indexPath, item in
-            
+    private func configureDataSource() {
+        let cellRegistaration = UICollectionView.CellRegistration<GenreCell, String> { cell, indexPath, genre in
+            cell.bind(genre)
         }
         
-        genreDataSource = UICollectionViewDiffableDataSource<Int, Int>(collectionView: genreCollectionView, cellProvider: { collectionView, indexPath, itemIdentifier in
+        genreDataSource = UICollectionViewDiffableDataSource<Int, String>(collectionView: genreCollectionView, cellProvider: { collectionView, indexPath, itemIdentifier in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: itemIdentifier)
         })
+    }
+    
+    func bind(title: String, rate: Double ,genres: [String], description: String) {
+        titleLabel.set(title: title, rate: rate)
         
-        var snapShot = NSDiffableDataSourceSnapshot<Int, Int>()
+        var snapShot = NSDiffableDataSourceSnapshot<Int, String>()
         snapShot.appendSections([0])
-        snapShot.appendItems(Array(0..<4))
+        snapShot.appendItems(genres)
         genreDataSource.apply(snapShot)
+        
+        descriptionLabel.text = description
     }
 }
 

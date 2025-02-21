@@ -24,7 +24,7 @@ final class ReviewedMovieCell: UICollectionViewCell {
         $0.textAlignment = .center
     }
     
-    private let movieStarRateView = StarRateView()
+    private let movieStarRateView = StarRateView(isEdit: false)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -68,5 +68,11 @@ final class ReviewedMovieCell: UICollectionViewCell {
         ]
         
         NSLayoutConstraint.activate(movieStarRateViewLayoutConstraints)
+    }
+    
+    func bind(_ review: Review) {
+        movieImageView.image = UIImage(data: review.movieImage!)
+        movieTitleLabel.text = review.movieTitle
+        movieStarRateView.set(rate: Int(review.rate))
     }
 }

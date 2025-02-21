@@ -21,13 +21,13 @@ struct MoviesDTO: Codable {
     }
     
     func toBackDrop() -> [Backdrop] {
-        results.map { Backdrop(path: $0.backdropPath, title: $0.title, overView: $0.overview) }
+        results.map { Backdrop(path: $0.backdropPath, title: $0.title, overView: $0.overview, movieID: $0.id) }
     }
     
     func toMovie() -> [Movie] {
         results.map {
             let genres = $0.genreIDS.map { getGenreName(by: $0) }
-            return Movie(posterImagePath: $0.posterPath, overView: $0.overview, title: $0.title, genres: genres, voteAverage: $0.voteAverage)
+            return Movie(movieID: $0.id, posterImagePath: $0.posterPath, overView: $0.overview, title: $0.title, genres: genres, voteAverage: $0.voteAverage)
         }
     }
     
@@ -96,10 +96,12 @@ struct Backdrop: Hashable {
     let path: String
     let title: String
     let overView: String
+    let movieID: Int
 }
 
 struct Movie: Hashable, Identifiable {
     let id = UUID()
+    let movieID: Int
     let posterImagePath: String
     let overView: String
     let title: String
