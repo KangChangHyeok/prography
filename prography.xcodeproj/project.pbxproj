@@ -241,8 +241,8 @@
 			children = (
 				63D1ACC92D68595D003786D8 /* AppDelegate.swift */,
 				63D1ACCC2D68595D003786D8 /* SceneDelegate.swift */,
-				63D1AC9B2D68595D003786D8 /* Resources */,
 				63D1ACC82D68595D003786D8 /* Sources */,
+				63D1AC9B2D68595D003786D8 /* Resources */,
 				63D1ACCA2D68595D003786D8 /* Info.plist */,
 				63D1ACCB2D68595D003786D8 /* LocalStorage.xcdatamodeld */,
 			);
