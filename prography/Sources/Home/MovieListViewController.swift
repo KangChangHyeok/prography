@@ -11,13 +11,13 @@ class MovieListViewController: UIViewController {
     
     // MARK: - Properties
     
-    var movieDataSource: UICollectionViewDiffableDataSource<Int, Movie>!
+    var dataSource: UICollectionViewDiffableDataSource<Int, Movie>!
     
     // MARK: - UI
     
-    lazy var movieCollectionView = UICollectionView(
+    lazy var collectionView = UICollectionView(
         frame: .zero,
-        collectionViewLayout: movieCollectionViewLayout()
+        collectionViewLayout: createCollectionViewLayout()
     ).configure {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.showsHorizontalScrollIndicator = false
@@ -50,7 +50,7 @@ class MovieListViewController: UIViewController {
 
 private extension MovieListViewController {
     
-    func movieCollectionViewLayout() -> UICollectionViewLayout {
+    func createCollectionViewLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
@@ -65,24 +65,23 @@ private extension MovieListViewController {
     }
     
     func configureLayout() {
-        view.addSubview(movieCollectionView)
+        view.addSubview(collectionView)
         let movieCollectionViewLayoutConstraints: [NSLayoutConstraint] = [
-            movieCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            movieCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            movieCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            movieCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(movieCollectionViewLayoutConstraints)
     }
     
     func configureDataSource() {
-        print(#function)
         let cellRegistaration = UICollectionView.CellRegistration<MovieCell, Movie> { cell, indexPath, movie in
             cell.bind(movie)
         }
         
-        movieDataSource = UICollectionViewDiffableDataSource<Int, Movie>(collectionView: movieCollectionView) { collectionView, indexPath, movie in
+        dataSource = UICollectionViewDiffableDataSource<Int, Movie>(collectionView: collectionView) { collectionView, indexPath, movie in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistaration, for: indexPath, item: movie)
         }
     }

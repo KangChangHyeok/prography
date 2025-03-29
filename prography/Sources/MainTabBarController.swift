@@ -9,12 +9,12 @@ import UIKit
 
 final class MainTabBarController: UITabBarController {
     
-    // MARK: - LifeCycle
+    // MARK: - Life Cycle
     
     override func viewDidLoad() {
-        configureViewControllers()
-        configureTabBarAppearance()
-        configureNavigationBarAppearance()
+        initailzieViewControllers()
+        configureTabBarStyle()
+        configureNavigationBarStyle()
     }
 }
 
@@ -22,7 +22,7 @@ final class MainTabBarController: UITabBarController {
 
 private extension MainTabBarController {
     
-    func createNavController(
+    func createNavigationController(
         for rootViewController: UIViewController,
         title: String,
         imageName: String,
@@ -42,8 +42,8 @@ private extension MainTabBarController {
         return navController
     }
     
-    func configureViewControllers() {
-        let HomeNavController = createNavController(
+    func initailzieViewControllers() {
+        let HomeNavController = createNavigationController(
             for: HomeViewController(),
             title: "Home",
             imageName: "House",
@@ -51,7 +51,7 @@ private extension MainTabBarController {
         )
         
         let myViewModel = MyViewModel()
-        let MyNavController = createNavController(
+        let MyNavController = createNavigationController(
             for: MyViewController(viewModel: myViewModel),
             title: "My",
             imageName: "Star",
@@ -60,7 +60,7 @@ private extension MainTabBarController {
         viewControllers = [HomeNavController, MyNavController]
     }
     
-    func configureTabBarAppearance() {
+    func configureTabBarStyle() {
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.backgroundColor = .init(hex: "f2f2f7")
         tabBarAppearance.configureWithOpaqueBackground()
@@ -72,7 +72,7 @@ private extension MainTabBarController {
         UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
     }
     
-    func configureNavigationBarAppearance() {
+    func configureNavigationBarStyle() {
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.backgroundColor = .white
         navigationBarAppearance.configureWithOpaqueBackground()

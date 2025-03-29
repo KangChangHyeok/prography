@@ -74,7 +74,7 @@ final class HomeViewController: UIViewController {
     
     private var pages: [MovieListViewController] = [MovieListViewController(), MovieListViewController(), MovieListViewController()]
     
-    private lazy var innerScrollViews = [pages[0].movieCollectionView, pages[1].movieCollectionView, pages[2].movieCollectionView]
+    private lazy var innerScrollViews = [pages[0].collectionView, pages[1].collectionView, pages[2].collectionView]
     
     // MARK: - Life Cycle
     
@@ -114,7 +114,7 @@ final class HomeViewController: UIViewController {
                 var snapShot = NSDiffableDataSourceSnapshot<Int, Movie>()
                 snapShot.appendSections([0])
                 snapShot.appendItems(movies)
-                self?.pages[0].movieDataSource?.apply(snapShot)
+                self?.pages[0].dataSource?.apply(snapShot)
             }
             .store(in: &cancelables)
         
@@ -126,7 +126,7 @@ final class HomeViewController: UIViewController {
                 var snapShot = NSDiffableDataSourceSnapshot<Int, Movie>()
                 snapShot.appendSections([0])
                 snapShot.appendItems(movies)
-                self?.pages[1].movieDataSource?.apply(snapShot)
+                self?.pages[1].dataSource?.apply(snapShot)
             }
             .store(in: &cancelables)
         
@@ -138,7 +138,7 @@ final class HomeViewController: UIViewController {
                 var snapShot = NSDiffableDataSourceSnapshot<Int, Movie>()
                 snapShot.appendSections([0])
                 snapShot.appendItems(movies)
-                self?.pages[2].movieDataSource?.apply(snapShot)
+                self?.pages[2].dataSource?.apply(snapShot)
             }
             .store(in: &cancelables)
         
